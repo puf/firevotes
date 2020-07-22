@@ -64,27 +64,27 @@ class BracketPainter extends CustomPainter {
         List<Offset> offsets;
         if (options.length == 8) {
           offsets = [
-            Offset( 50,  20),
+            Offset( 50,  10),
             Offset( 50, 180),
-            Offset( 50, 290),
+            Offset( 50, 280),
             Offset( 50, 450),
-            Offset(540,  20),
+            Offset(540,  10),
             Offset(540, 180),
-            Offset(540, 290),
+            Offset(540, 280),
             Offset(540, 450),
           ];
         }
         else if (options.length == 4) {
           offsets = [
-            Offset(165,  90),
+            Offset(165,  80),
             Offset(165, 380),
-            Offset(420,  90),
+            Offset(420,  80),
             Offset(420, 380),
           ];
         }
         else if (options.length == 2) {
           offsets = [
-            Offset(285, 190),
+            Offset(285, 180),
             Offset(310, 290),
           ];
         }
@@ -99,7 +99,8 @@ class BracketPainter extends CustomPainter {
           var total = totals.containsKey(option) ? totals[option] : 0;
           var isLeading = total > (i % 2 == 0 ? getTotalForOption(i+1) : getTotalForOption(i-1));
           var text = i<options.length/2 ? option+": "+total.toString() : total.toString()+": "+option;
-          paintTextAt(canvas, text, 20, isLeading ? Colors.black : Colors.black54, size.width, offsets[i]);
+          //Divide width by 5.3 (number of segments -> [rounds * 2] - 1) plus a little smaller
+          paintTextAt(canvas, text, 24, isLeading ? Colors.black : Colors.black54, size.width / 5.3, offsets[i]);
         }
       });
     }

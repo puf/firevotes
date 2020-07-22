@@ -69,50 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     dbRoot = FirebaseDatabase(app: this.app).reference();
 
-    //TODO Move each of these blocks into a bite-sized method
-    //Load current bracket
     dbRoot.child('current_bracket').onValue.listen((event) {
-      print('Got current_bracket: ${event.snapshot.value}');
-      if (event.snapshot.value == null) return;
-      setState(() {
-        bracket.roundKeys = Map<String,String>.from(event.snapshot.value as Map<dynamic, dynamic>).values.toList();
-        print('bracket.roundKeys: ${bracket.roundKeys}');
-      });
-
-      // Add new round listeners
-      bracket.roundKeys.forEach((roundKey) { 
-        if (!bracket.roundOptionsListeners.containsKey(roundKey)) {
-          print('Adding listener for options and totals of round $roundKey');
-          bracket.roundOptionsListeners[roundKey] = dbRoot.child('/rounds/$roundKey').onValue.listen((event) {
-            print('Got options for bracket round $roundKey');
-            bracket.roundOptions[roundKey] = List<String>.from(event.snapshot.value as List<dynamic>);
-            setState(() { });
-          });
-          bracket.roundTotalsListeners[roundKey] = dbRoot.child('/totals/$roundKey').onValue.listen((event) {
-            if (event.snapshot.value != null) {
-              print('Got totals for bracket round $roundKey');
-              bracket.roundTotals[roundKey] = Map<String,int>.from(event.snapshot.value as Map<dynamic, dynamic>);
-              setState(() { });
-            }
-          });
-        }
-      });
-
-      // remove outdated listeners
-      bracket.roundOptionsListeners.forEach((key, value) {
-        if (!bracket.roundKeys.contains(key)) {
-          print('Removing options listener for bracket round $key');
-          value.cancel();
-          bracket.roundOptionsListeners[key] = null;
-        }
-      });
-      bracket.roundTotalsListeners
-        .keys
-        .where((key) => !bracket.roundKeys.contains(key))
-        .forEach((key) { 
-          bracket.roundTotalsListeners[key].cancel();
-          bracket.roundTotalsListeners[key] = null;
-        });
+      setRounds(event);
+      addRoundsListeners(event);
+      removeOutdatedListeners(event);
     });
 
     //Loads current round
@@ -121,11 +81,13 @@ class _MyHomePageState extends State<MyHomePage> {
         currentRoundListener.cancel();
         currentRoundListener = null;
       }
+
       setState(() { 
         currentRoundKey = event.snapshot.value;
         currentRound = [];
         currentRoundIndex = 0;
       });
+
       if (currentRoundKey != null) {
         currentRoundListener = dbRoot.child('rounds/$currentRoundKey').onValue.listen((event) {
           setState(() { 
@@ -136,6 +98,56 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
+
+  void setRounds(Event event) {
+    print('Got current_bracket: ${event.snapshot.value}');
+    if (event.snapshot.value == null) return;
+    setState(() {
+      bracket.roundKeys = Map<String,String>.from(event.snapshot.value as Map<dynamic, dynamic>).values.toList();
+      print('bracket.roundKeys: ${bracket.roundKeys}');
+    });
+  }
+
+  void addRoundsListeners(Event event) {
+    bracket.roundKeys.forEach((roundKey) {
+      if (!bracket.roundOptionsListeners.containsKey(roundKey)) {
+        print('Adding listener for options and totals of round $roundKey');
+        bracket.roundOptionsListeners[roundKey] = dbRoot.child('/rounds/$roundKey').onValue.listen((event) {
+          print('Got options for bracket round $roundKey');
+          bracket.roundOptions[roundKey] = List<String>.from(event.snapshot.value as List<dynamic>);
+          //TODO check if setState with empty values is even necessary
+          setState(() { });
+        });
+        bracket.roundTotalsListeners[roundKey] = dbRoot.child('/totals/$roundKey').onValue.listen((event) {
+          if (event.snapshot.value != null) {
+            print('Got totals for bracket round $roundKey');
+            bracket.roundTotals[roundKey] = Map<String,int>.from(event.snapshot.value as Map<dynamic, dynamic>);
+            setState(() { });
+          }
+        });
+      }
+    });
+  }
+
+  void removeOutdatedListeners(Event event) {
+    bracket.roundOptionsListeners.forEach((key, value) {
+      if (!bracket.roundKeys.contains(key)) {
+        print('Removing options listener for bracket round $key');
+        value.cancel();
+        bracket.roundOptionsListeners[key] = null;
+      }
+    });
+
+    bracket.roundTotalsListeners
+        .keys
+        .where((key) => !bracket.roundKeys.contains(key))
+        .forEach((key) {
+      bracket.roundTotalsListeners[key].cancel();
+      bracket.roundTotalsListeners[key] = null;
+    });
+  }
+
+  //Called by MyVoteWidget's buttons
   void vote(String roundKey, String option) {
     dbRoot.child('votes/$currentRoundKey/${user.uid}').set(option);
   }
@@ -146,26 +158,28 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            currentRoundKey != null ?
-              MyVoteWidget(currentRoundKey, currentRound, currentRoundIndex, vote) : 
+      body: Padding(padding: const EdgeInsets.all(8),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              currentRoundKey != null ?
+              MyVoteWidget(currentRoundKey, currentRound, currentRoundIndex, vote) :
               Text("Waiting for round to start..."),
-            FittedBox(
-              fit: BoxFit.contain,
-              child: SizedBox(
-                width: 700,
-                height: 500,
-                child: CustomPaint(
-                  painter: BracketPainter(Key("painter"), bracket),
-                )
+              FittedBox(
+                  fit: BoxFit.contain,
+                  child: SizedBox(
+                      width: 700,
+                      height: 500,
+                      child: CustomPaint(
+                        painter: BracketPainter(Key("painter"), bracket),
+                      )
+                  )
               )
-            )
-          ],
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 }

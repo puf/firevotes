@@ -16,8 +16,8 @@ class MyVoteWidget extends StatelessWidget {
     return Column(children: <Widget>[
       Text(this.roundKey != null ? this.roundKey : "Loading..."),
       Row(children: <Widget>[
-        Expanded(child: RaisedButton(onPressed: () { callback(roundKey, option1); }, child: Text(option1))),
-        Expanded(child: RaisedButton(onPressed: () { callback(roundKey, option2); }, child: Text(option2)))
+        Expanded(child: RaisedButton(onPressed: () { callback(roundKey, option1); }, child: Text(option1), color: Color(0xFFFFA000))),
+        Expanded(child: RaisedButton(onPressed: () { callback(roundKey, option2); }, child: Text(option2), color: Color(0xFFFF8A65)))
       ]),
     ]);
   }
