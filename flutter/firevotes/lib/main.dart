@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   runApp(MaterialApp(
     title: '🔥💙 FlutterFire Votes 💙🔥',
@@ -52,6 +53,28 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
+    FirebaseAuth.instance.signInAnonymously().then((result) {
+      setState(() {
+        this.user = result.user;
+      });
+    });
+
+    dbRoot = FirebaseDatabase.instance.reference();
+
+    dbRoot.child('rounds').orderByKey().limitToLast(1).onChildAdded.listen((event) {
+      var options = List<String>.from(event.snapshot.value as List<dynamic>);
+      print('Got options $options');
+      setState(() {
+        currentRoundKey = event.snapshot.key;
+        var index = 2 * Random().nextInt(options.length ~/ 2); 
+        option1 = options[index];
+        option2 = options[index+1];
+      });
+    });
+  }
+
+  void vote(String value) {
+    dbRoot.child('votes/$currentRoundKey/${user.uid}').set(value);
   }
 
   @override
@@ -62,7 +85,18 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: Padding(padding: const EdgeInsets.all(8),
         child: Center(
-          child:Text("Hello World")
+          child: Row(children: <Widget>[
+            Expanded(child: RaisedButton(
+              child: Text(option1 ?? "..."),
+              color: Colors.orange,
+              onPressed: () { vote(option1); }
+            )),
+            Expanded(child: RaisedButton(
+              child: Text(option2 ?? "..."),
+              color: Colors.blue,
+              onPressed: () { vote(option2); }
+            ))
+          ])
         )
       )
     );
