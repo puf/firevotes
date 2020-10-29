@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="firevotesWeb">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-auth.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-database.js"></script>  
+  <script>
+    // Your web app's Firebase configuration
+    console.log("Initializing FlutterFire")
+    // Initialize Firebase
+    firebase.initializeApp({
+      apiKey: "AIzaSyAt_is4HeYaWlrotAMHmfMcrrQo9TCISwE",
+      authDomain: "firevotes.firebaseapp.com",
+      databaseURL: "https://firevotes.firebaseio.com",
+      projectId: "firevotes",
+      storageBucket: "firevotes.appspot.com",
+      messagingSenderId: "683370992766",
+      appId: "1:683370992766:web:ace8f3ead4c5d02dd6f42f",
+    });
+  </script>
+  <title>firevotesWeb</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js');
+      });
+    }
+  </script>
+  <script src="main.dart.js" type="application/javascript"></script>
+</body>
+</html>

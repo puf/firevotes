@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "683370992766",
+    "firebase_url": "https://firevotes.firebaseio.com",
+    "project_id": "firevotes",
+    "storage_bucket": "firevotes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683370992766:android:619af5fbff695544d6f42f",
+        "android_client_info": {
+          "package_name": "com.example.firevotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "683370992766-8a3f12upj26tb69i7db34mgllil2g2qu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkL7r8MePU4sU-2ipkYwZsV8digavndbg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "683370992766-8a3f12upj26tb69i7db34mgllil2g2qu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "683370992766-5iffqrgmp8dssin1t5v63nfdajtj2co0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firevotes"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
