@@ -1,0 +1,54 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "current_bracket": {
+      ".read": true,
+      "$round": {
+	      ".validate": "root.child('rounds').child(newData.val()).exists()"
+      }
+    },
+    "current_round": {
+    	".read": true,
+      ".validate": "root.child('rounds').child(newData.val()).exists()"
+    },
+    "rounds": {
+      ".read": "query.orderByKey && query.limitToLast === 1",
+      "$round": {
+        ".read": true,
+        ".validate": true,
+        "$option": {
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+    "options": {
+      ".read": "root.child('settings/web/screen').val() >= 7 && root.child('settings/web/screen').val() <= 8"
+    },
+    "votes": {
+      ".write": "
+      	(root.child('settings/web/screen').val() == 3 && (newData.val() === 'Yes' || newData.val() === 'No'))
+      ||(root.child('settings/web/screen').val() >= 4 && root.child('settings/web/screen').val() <= 5 && (newData.val() === 'Yes' || newData.val() === 'No') && auth.uid != null)
+      ",
+      "$round": {
+        ".write": "
+          (root.child('settings/web/screen').val() == 6 && (newData.val() === 'Yes' || newData.val() === 'No') && auth.uid != null && $round === auth.uid)
+        ||(root.child('settings/web/screen').val() == 8 && (newData.val().matches(/(orange|blue|green|yellow|brown)/i)))
+        ",
+        "$uid": {
+          ".write": "auth.uid === $uid",
+          ".validate": "root.child('rounds').child($round).exists() 
+                     && root.child('totals').child($round).child(newData.val()).exists()"
+        }
+      }
+    },
+    "totals": {
+      "$round": {
+        ".read": true
+      }
+    },
+    "settings": {
+      ".read": true
+    }
+  }
+}
