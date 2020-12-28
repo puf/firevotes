@@ -132,14 +132,14 @@ So: as we were explaining a new piece of code, we also set the `/settings/web/sc
 You may have noticed in our talk that the security rules we used were all showing in slides, we never actually entered them into the Firebase console. While we could have love-coded the rules, we decided that the risk of doing so was too big. With thousands of remote attendees, we needed to make sure we never showed any TODO: bad content, and the risk of making a mistake in our security rules was a bit too much.
 
 So instead: we had predeployed our security rules before the talk. But… since we had 9 demo moments in the talk, our rules also had to covers all those moments at the same time. So we had the rules for demo 1:
-
+```
 {
   "rules": {
     ".read": false,
     ".write": false,
   }
 }
-
+```
 But also the rules for the final demo 9:
 ```
 "votes": {
