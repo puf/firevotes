@@ -1,6 +1,6 @@
 # firevotes
 
-This repo contains all the code for the audience polling app that is build in this 50m talk 
+This repo contains all the code for the audience polling app that is built in this 50m talk 
 [Zero to app: Livecoding a cross platform app with Firebase and Flutter](https://youtu.be/rwrUezKCc34). 
 It also contains the code for the companion (web) app that allowed the audience to participate.
 
