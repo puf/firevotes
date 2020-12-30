@@ -10,6 +10,6 @@ The repo contains the following top-level folders:
 
 * `flutter` - This contains the final version of the app that was built in the talk, and is designed to run on iOS and Android. 
 * `build/web`
-* `firevotesWeb` - This is the companion web app that the audience used during the talk, and which is hosted on https://firevotes.web.app.
+* `firevotesWeb` - This is the companion web app that the audience used during the talk, and which is hosted on https://firevotes.web.app. This also contains documentation on how the webapp works.
 * `functions` - These are the Cloud Functions that were either shown in during the talk, or used during the later demos.
 * `scripts` - Some Node.js script that are handy for running locally.
