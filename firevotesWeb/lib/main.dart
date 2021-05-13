@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-//import 'package:firebase/firebase.dart';
 import 'package:firebase/firebase.dart' as dartfire;
 import 'package:firebase_auth/firebase_auth.dart';
 
-void main() async {
+import 'bracket.dart';
+
+void main() {
   if (dartfire.apps.isEmpty) {
     dartfire.initializeApp(
       apiKey: "AIzaSyAt_is4HeYaWlrotAMHmfMcrrQo9TCISwE",
@@ -35,9 +36,9 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({required this.title}) : super(key: Key("MyHomePage"));
+  MyHomePage({Key key, this.title}) : super(key: key);
 
-  final String? title;
+  final String title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -70,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
 
   int index = -1;
-  StreamSubscription? screenListener;
+  StreamSubscription screenListener;
 
   @override
   void initState() {
@@ -99,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override 
   void dispose() {
     print("Canceling screen listener");
-    screenListener?.cancel();
+    screenListener.cancel();
     super.dispose();
   }
 
@@ -107,9 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title ?? "N/A"),
+        title: Text(widget.title),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
+          preferredSize: null,
           child: Text(index >= 0 && index < titles.length ? titles[index] : "...")
         )
       ),
@@ -137,19 +138,13 @@ class Demo1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               child: Text("Yes"),
-              onPressed: () {},            
-              //color: Colors.orange
-          )
-      ),
+              color: Colors.orange)),
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               child: Text("No"),
-              onPressed: () {},            
-              //color: Colors.blue
-          )
-      ),
+              color: Colors.blue)),
     ]);
   }
 }
@@ -165,12 +160,12 @@ class Demo2 extends StatelessWidget {
   void vote(BuildContext context, String option) {
     dbRoot.child("votes").set(option).then((value) {
       print("then: $value");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('$option written'),
       ));
     }).catchError((e) {
       print("catchError: $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('$e'),
       ));
     });
@@ -180,17 +175,15 @@ class Demo2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               onPressed: () { vote(context, "Yes"); },
               child: Text("Yes"),
-              //color: Colors.orange
-          )),
+              color: Colors.orange)),
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               onPressed: () { vote(context, "No"); },
               child: Text("No"),
-              //color: Colors.blue
-         )),
+              color: Colors.blue)),
     ]);
   }
 }
@@ -209,7 +202,7 @@ class Demo5 extends StatefulWidget {
 
 class _Demo5State extends State<Demo5> {
   final dartfire.DatabaseReference dbRoot = dartfire.database().ref('/');
-  late User user;
+  User user;
 
   @override
   void initState() {
@@ -219,7 +212,7 @@ class _Demo5State extends State<Demo5> {
       print("${this.runtimeType}: Signing in");
       FirebaseAuth.instance.signInAnonymously().then((result) {
         setState(() {
-          this.user = result.user!;
+          this.user = result.user;
         });
       });
     });
@@ -230,29 +223,29 @@ class _Demo5State extends State<Demo5> {
     super.dispose();
   }
 
-  dartfire.DatabaseReference? getVotePath() {
+  dartfire.DatabaseReference getVotePath() {
     return dbRoot.child("votes");
   }
 
   void vote(BuildContext context, String option) {
-    dartfire.DatabaseReference? ref = getVotePath();
+    dartfire.DatabaseReference ref = getVotePath();
     if (ref != null) {
       print("Writing $option to $ref");
       ref.set(option).then((value) {
         print("then: $value");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('$option written'),
         ));
       }).catchError((e) {
         print("catchError: $e");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('$e'),
         ));
       });
     }
     else {
       print('Clicked on $option');
-      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      // Scaffold.of(context).showSnackBar(SnackBar(
       //   content: Text('Clicked on $option'),
       // ));
     }
@@ -262,21 +255,19 @@ class _Demo5State extends State<Demo5> {
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               onPressed: () {
                 vote(context, "Yes");
               },
               child: Text("Yes"),
-              //color: Colors.orange
-          )),
+              color: Colors.orange)),
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               onPressed: () {
                 vote(context, "No");
               },
               child: Text("No"),
-              //color: Colors.blue
-          )),
+              color: Colors.blue)),
     ]);
   }
 }
@@ -289,7 +280,7 @@ class Demo6 extends Demo5 {
 
 class _Demo6State extends _Demo5State {
   @override
-  dartfire.DatabaseReference? getVotePath() {
+  dartfire.DatabaseReference getVotePath() {
     return dbRoot.child("votes").child(user.uid);
   }
 }
@@ -301,7 +292,7 @@ class Demo7 extends Demo6 {
 }
 
 class _Demo7State extends _Demo6State {
-  late StreamSubscription optionsListener;
+  StreamSubscription optionsListener;
 
   @override
   void initState() {
@@ -309,7 +300,7 @@ class _Demo7State extends _Demo6State {
     optionsListener = dbRoot.child('options').onValue.listen((event) {
       var options = List<String>.from(event.snapshot.val() as List<dynamic>);
       print('Got options $options');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('Got options $options'),
       ));
     });
@@ -320,7 +311,7 @@ class _Demo7State extends _Demo6State {
     super.dispose();
   }
   @override
-  dartfire.DatabaseReference? getVotePath() {
+  dartfire.DatabaseReference getVotePath() {
     return null;
   }
 }
@@ -332,8 +323,8 @@ class Demo8 extends Demo7 {
 
 // Demo8: we can now change the values on your buttons.
 class _Demo8State extends _Demo7State {
-  String? option1, option2;
-  late StreamSubscription optionsListener;
+  String option1, option2;
+  StreamSubscription optionsListener;
 
   @override
   void initState() {
@@ -353,7 +344,7 @@ class _Demo8State extends _Demo7State {
     super.dispose();
   }
 
-  dartfire.DatabaseReference? getVotePath() {
+  dartfire.DatabaseReference getVotePath() {
     return dbRoot.child("votes").child(user.uid);
   }
 
@@ -362,21 +353,19 @@ class _Demo8State extends _Demo7State {
     return (option1 == null || option2 == null) ? Text("Loading...") :
     Row(children: <Widget>[
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               onPressed: () {
-                vote(context, option1!);
+                vote(context, option1);
               },
-              child: Text(option1!),
-              //color: Colors.orange
-          )),
+              child: Text(option1),
+              color: Colors.orange)),
       Expanded(
-          child: ElevatedButton(
+          child: RaisedButton(
               onPressed: () {
-                vote(context, option2!);
+                vote(context, option2);
               },
-              child: Text(option2!),
-              //color: Colors.blue
-          )),
+              child: Text(option2),
+              color: Colors.blue)),
     ]);
   }
 }
@@ -388,16 +377,16 @@ class Demo9 extends Demo8 {
 }
 
 class _Demo9State extends _Demo8State {
-  StreamSubscription? currentRoundListener;
-  String? currentRoundKey;
+  StreamSubscription currentRoundListener;
+  String currentRoundKey;
   bool showBracket = false;
-  //Bracket bracket;
+  Bracket bracket;
 
   @override
   void initState() {
     super.initState();
 
-    //bracket = Bracket(Key("bracket"), dbRoot);
+    bracket = Bracket(Key("bracket"), dbRoot);
 
     dbRoot.child("rounds").orderByKey().limitToLast(1).onChildAdded.listen((event) {
       var options = List<String>.from(event.snapshot.val() as List<dynamic>);
@@ -423,7 +412,7 @@ class _Demo9State extends _Demo8State {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      ElevatedButton(
+      RaisedButton(
         child: Text("Show ${showBracket ? 'buttons' : 'bracket'}"),
         onPressed: () { 
           setState(() { 
@@ -431,7 +420,7 @@ class _Demo9State extends _Demo8State {
           }) ;
         },
       ),
-      //showBracket ? bracket : super.build(context)
+      showBracket ? bracket : super.build(context)
     ]);
   }
 
