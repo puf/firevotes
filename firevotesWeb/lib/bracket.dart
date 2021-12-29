@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase/firebase.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -22,8 +22,8 @@ class BracketState extends State<Bracket> {
   List<String> roundKeys = List();
   Map<String, List<String>> roundOptions = Map();
   Map<String, Map<String, int>> roundTotals = Map();
-  Map<String, StreamSubscription<QueryEvent>> roundOptionsListeners = Map();
-  Map<String, StreamSubscription<QueryEvent>> roundTotalsListeners = Map();
+  Map<String, StreamSubscription<DatabaseEvent>> roundOptionsListeners = Map();
+  Map<String, StreamSubscription<DatabaseEvent>> roundTotalsListeners = Map();
 
   BracketState(this.dbRoot) {
     dbRoot.child('current_bracket').onValue.listen((event) {
@@ -33,25 +33,25 @@ class BracketState extends State<Bracket> {
     });
   }
 
-  void setRounds(QueryEvent event) {
-    if (event.snapshot.val() == null) return;
+  void setRounds(DatabaseEvent event) {
+    if (!event.snapshot.exists) return;
     setState(() {
-      roundKeys = Map<String,String>.from(event.snapshot.val() as Map<dynamic, dynamic>).values.toList();
+      roundKeys = Map<String,String>.from(event.snapshot.value as Map<dynamic, dynamic>).values.toList();
     });
   }
 
-  void addRoundsListeners(QueryEvent event) {
-    if( event.snapshot.val() == null ) return;
+  void addRoundsListeners(DatabaseEvent event) {
+    if (!event.snapshot.exists) return;
 
     roundKeys.forEach((roundKey) {
       if (!roundOptionsListeners.containsKey(roundKey)) {
         roundOptionsListeners[roundKey] = dbRoot.child('/rounds/$roundKey').onValue.listen((event) {
-          roundOptions[roundKey] = List<String>.from(event.snapshot.val() as List<dynamic>);
+          roundOptions[roundKey] = List<String>.from(event.snapshot.value as List<dynamic>);
           setState(() { });
         });
         roundTotalsListeners[roundKey] = dbRoot.child('/totals/$roundKey').onValue.listen((event) {
-          if (event.snapshot.val() != null) {
-            roundTotals[roundKey] = Map<String,int>.from(event.snapshot.val());
+          if (event.snapshot.exists) {
+            roundTotals[roundKey] = Map<String,int>.from(event.snapshot.value);
             setState(() { });
           }
         });
@@ -59,7 +59,7 @@ class BracketState extends State<Bracket> {
     });
   }
 
-  void removeOutdatedListeners(QueryEvent event) {
+  void removeOutdatedListeners(DatabaseEvent event) {
     roundOptionsListeners.forEach((key, value) {
       if (!roundKeys.contains(key)) {
         if (value != null) value.cancel();

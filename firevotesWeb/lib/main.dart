@@ -2,20 +2,23 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:firebase/firebase.dart' as dartfire;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'bracket.dart';
 
-void main() {
-  if (dartfire.apps.isEmpty) {
-    dartfire.initializeApp(
-      apiKey: "AIzaSyAt_is4HeYaWlrotAMHmfMcrrQo9TCISwE",
-      authDomain: "firevotes.firebaseapp.com",
-      databaseURL: "https://firevotes.firebaseio.com",
-      projectId: "firevotes",
-      storageBucket: "firevotes.appspot.com",
-    );
+void main() async {
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyAt_is4HeYaWlrotAMHmfMcrrQo9TCISwE",
+        authDomain: "firevotes.firebaseapp.com",
+        projectId: "firevotes",
+        messagingSenderId: '',
+        appId: ''
+      )
+    );    
   }
 
   runApp(MyApp());
@@ -77,11 +80,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    dartfire.Database db = dartfire.database();
-    dartfire.DatabaseReference ref = db.ref('settings/web/screen');
+    FirebaseDatabase db = FirebaseDatabase.instance;
+    DatabaseReference ref = db.ref('settings/web/screen');
     print("Attaching screen listener");
     screenListener = ref.onValue.listen((e) {
-      var newIndex = e.snapshot.val() as int;
+      var newIndex = e.snapshot.value as int;
       if (newIndex != index) {
         print("Setting screen index from $index to $newIndex");
         setState(() {
@@ -151,7 +154,7 @@ class Demo1 extends StatelessWidget {
 
 // Demo2: write gets rejected
 class Demo2 extends StatelessWidget {
-  final dartfire.DatabaseReference dbRoot = dartfire.database().ref("/");
+  final DatabaseReference dbRoot = FirebaseDatabase.instance.ref();
 
   Demo2() {
     FirebaseAuth.instance.signOut();
@@ -159,7 +162,7 @@ class Demo2 extends StatelessWidget {
 
   void vote(BuildContext context, String option) {
     dbRoot.child("votes").set(option).then((value) {
-      print("then: $value");
+      print("then:");
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('$option written'),
       ));
@@ -201,7 +204,7 @@ class Demo5 extends StatefulWidget {
 }
 
 class _Demo5State extends State<Demo5> {
-  final dartfire.DatabaseReference dbRoot = dartfire.database().ref('/');
+  final DatabaseReference dbRoot = FirebaseDatabase.instance.ref();
   User user;
 
   @override
@@ -223,16 +226,16 @@ class _Demo5State extends State<Demo5> {
     super.dispose();
   }
 
-  dartfire.DatabaseReference getVotePath() {
+  DatabaseReference getVotePath() {
     return dbRoot.child("votes");
   }
 
   void vote(BuildContext context, String option) {
-    dartfire.DatabaseReference ref = getVotePath();
+    DatabaseReference ref = getVotePath();
     if (ref != null) {
       print("Writing $option to $ref");
       ref.set(option).then((value) {
-        print("then: $value");
+        print("then:");
         Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('$option written'),
         ));
@@ -280,7 +283,7 @@ class Demo6 extends Demo5 {
 
 class _Demo6State extends _Demo5State {
   @override
-  dartfire.DatabaseReference getVotePath() {
+  DatabaseReference getVotePath() {
     return dbRoot.child("votes").child(user.uid);
   }
 }
@@ -298,7 +301,7 @@ class _Demo7State extends _Demo6State {
   void initState() {
     super.initState();
     optionsListener = dbRoot.child('options').onValue.listen((event) {
-      var options = List<String>.from(event.snapshot.val() as List<dynamic>);
+      var options = List<String>.from(event.snapshot.value as List<dynamic>);
       print('Got options $options');
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('Got options $options'),
@@ -311,7 +314,7 @@ class _Demo7State extends _Demo6State {
     super.dispose();
   }
   @override
-  dartfire.DatabaseReference getVotePath() {
+  DatabaseReference getVotePath() {
     return null;
   }
 }
@@ -329,7 +332,7 @@ class _Demo8State extends _Demo7State {
   @override
   void initState() {
     optionsListener = dbRoot.child('options').onValue.listen((event) {
-      var options = List<String>.from(event.snapshot.val() as List<dynamic>);
+      var options = List<String>.from(event.snapshot.value as List<dynamic>);
       print('Got options $options');
       setState(() {
         option1 = options[0];
@@ -344,7 +347,7 @@ class _Demo8State extends _Demo7State {
     super.dispose();
   }
 
-  dartfire.DatabaseReference getVotePath() {
+  DatabaseReference getVotePath() {
     return dbRoot.child("votes").child(user.uid);
   }
 
@@ -389,7 +392,7 @@ class _Demo9State extends _Demo8State {
     bracket = Bracket(Key("bracket"), dbRoot);
 
     dbRoot.child("rounds").orderByKey().limitToLast(1).onChildAdded.listen((event) {
-      var options = List<String>.from(event.snapshot.val() as List<dynamic>);
+      var options = List<String>.from(event.snapshot.value as List<dynamic>);
       print('Got options $options');
       setState(() {
         currentRoundKey = event.snapshot.key;
@@ -405,7 +408,7 @@ class _Demo9State extends _Demo8State {
     super.dispose();
   }
 
-  dartfire.DatabaseReference getVotePath() {
+  DatabaseReference getVotePath() {
     return dbRoot.child("votes/$currentRoundKey/${user.uid}");
   }
 
