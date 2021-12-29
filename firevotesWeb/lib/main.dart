@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
         bottom: PreferredSize(
-          preferredSize: null,
+          preferredSize: Size.fromHeight(4.0),
           child: Text(index >= 0 && index < titles.length ? titles[index] : "...")
         )
       ),
