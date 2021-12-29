@@ -13,8 +13,8 @@ description: A new Flutter project.
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
 
-#environment:
-  #sdk: ">=2.1.0 <3.0.0"
+environment:
+  sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -24,7 +24,7 @@ dependencies:
   firebase_auth:
   firebase_storage:
   #provider: ^3.1.0
-  cupertino_icons: ^0.1.2
+  cupertino_icons: ^1.0.4
 
 
 dev_dependencies:
