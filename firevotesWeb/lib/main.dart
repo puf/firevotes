@@ -415,7 +415,7 @@ class _Demo9State extends _Demo8State {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      RaisedButton(
+      ElevatedButton(
         child: Text("Show ${showBracket ? 'buttons' : 'bracket'}"),
         onPressed: () { 
           setState(() { 

@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/widgets.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
@@ -19,7 +17,7 @@ class BracketState extends State<Bracket> {
 
   DatabaseReference dbRoot;
 
-  List<String> roundKeys = List();
+  List<String> roundKeys = [];
   Map<String, List<String>> roundOptions = Map();
   Map<String, Map<String, int>> roundTotals = Map();
   Map<String, StreamSubscription<DatabaseEvent>> roundOptionsListeners = Map();

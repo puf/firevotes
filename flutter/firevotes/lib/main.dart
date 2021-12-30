@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String option2;
   User user;
   
-  _MyHomePageState() {}
+  _MyHomePageState();
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
 
-    dbRoot = FirebaseDatabase.instance.reference();
+    dbRoot = FirebaseDatabase.instance.ref();
 
     dbRoot.child('rounds').orderByKey().limitToLast(1).onChildAdded.listen((event) {
       var options = List<String>.from(event.snapshot.value as List<dynamic>);
